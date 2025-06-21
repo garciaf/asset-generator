@@ -1,0 +1,27 @@
+.space-y-6
+  / Header
+  .bg-white.shadow
+    .px-4.py-5.sm:p-6
+      .flex.items-center.justify-between
+        %div
+          %h1.text-3xl.font-bold.leading-tight.text-gray-900 Edit Image
+          %p.mt-2.max-w-4xl.text-sm.text-gray-500
+            Update the title and description for this image
+        %div
+          = link_to @image, class: "btn-secondary" do
+            %svg.h-5.w-5.mr-2{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+              %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"}
+            Back to Image
+
+  / Current Image Preview
+  - if @image.file.attached?
+    .bg-white.shadow.rounded-lg.mb-6
+      .px-4.py-5.sm:p-6
+        %h3.text-lg.font-medium.text-gray-900 Current Image
+        .mt-4.text-center
+          = image_tag @image.file, alt: @image.title, class: "max-w-full h-auto rounded-lg shadow-lg mx-auto", style: "max-height: 300px;"
+
+  / Form
+  .bg-white.shadow.rounded-lg
+    .px-4.py-5.sm:p-6
+      = render "form"

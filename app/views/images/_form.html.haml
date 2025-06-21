@@ -1,0 +1,38 @@
+= form_with model: @image, local: true, class: "space-y-6" do |form|
+  - if @image.errors.any?
+    .bg-red-50.border.border-red-200.rounded-md.p-4.mb-6
+      .flex
+        .flex-shrink-0
+          %svg.h-5.w-5.text-red-400{"aria-hidden" => "true", fill: "currentColor", viewbox: "0 0 20 20"}
+            %path{"clip-rule" => "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z", "fill-rule" => "evenodd"}
+        .ml-3
+          %h3.text-sm.font-medium.text-red-800
+            = pluralize(@image.errors.count, "error")
+            prohibited this image from being saved:
+          .mt-2
+            %ul.list-disc.list-inside.text-sm.text-red-700
+              - @image.errors.full_messages.each do |message|
+                %li= message
+
+  .form-group
+    = form.label :title, class: "block text-sm font-medium text-gray-700"
+    .mt-1
+      = form.text_field :title, class: "form-input", placeholder: "Enter a title for the image..."
+
+  .form-group
+    = form.label :description, class: "block text-sm font-medium text-gray-700"
+    .mt-1
+      = form.text_area :description, rows: 4, class: "form-textarea", placeholder: "Describe the image content, style, or purpose..."
+    %p.mt-2.text-sm.text-gray-500
+      This description helps identify the image and can be used for AI analysis in variations.
+
+  - unless @image.persisted?
+    .form-group
+      = form.label :file, "Upload Image", class: "block text-sm font-medium text-gray-700"
+      .mt-1
+        = form.file_field :file, accept: "image/*", class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+
+  .flex.justify-end.space-x-3
+    = link_to images_path, class: "btn-secondary" do
+      Cancel
+    = form.submit (@image.persisted? ? "Update Image" : "Create Image"), class: "btn-primary"

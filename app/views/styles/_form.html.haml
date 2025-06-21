@@ -1,0 +1,33 @@
+/ Shared form partial for Style objects
+= form_with model: style, local: true, class: "space-y-6" do |form|
+  - if style.errors.any?
+    .bg-red-50.border.border-red-200.rounded-md.p-4.mb-6
+      .flex
+        .flex-shrink-0
+          %svg.h-5.w-5.text-red-400{"aria-hidden" => "true", fill: "currentColor", viewbox: "0 0 20 20"}
+            %path{"clip-rule" => "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z", "fill-rule" => "evenodd"}
+        .ml-3
+          %h3.text-sm.font-medium.text-red-800
+            = pluralize(style.errors.count, "error")
+            prohibited this style from being saved:
+          .mt-2
+            %ul.list-disc.list-inside.text-sm.text-red-700
+              - style.errors.full_messages.each do |message|
+                %li= message
+
+  .form-group
+    = form.label :title, class: "block text-sm font-medium text-gray-700"
+    .mt-1
+      = form.text_field :title, class: "form-input", placeholder: "e.g., Digital Art Style"
+
+  .form-group
+    = form.label :prompt, class: "block text-sm font-medium text-gray-700"
+    .mt-1
+      = form.text_area :prompt, rows: 4, class: "form-textarea", placeholder: "Enter your AI prompt template here..."
+    %p.mt-2.text-sm.text-gray-500
+      This prompt will be used as a base for generating images. Be descriptive and specific about the style you want.
+
+  .flex.justify-end.space-x-3
+    = link_to (style.persisted? ? style : styles_path), class: "btn-secondary" do
+      Cancel
+    = form.submit (style.persisted? ? "Update Style" : "Create Style"), class: "btn-primary"

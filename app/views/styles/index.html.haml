@@ -1,0 +1,43 @@
+.space-y-6
+  / Header
+  .bg-white.shadow
+    .px-4.py-5.sm:p-6
+      .flex.items-center.justify-between
+        %div
+          %h1.text-3xl.font-bold.leading-tight.text-gray-900 Styles
+          %p.mt-2.max-w-4xl.text-sm.text-gray-500
+            Manage your AI image generation styles and prompts
+        %div
+          = link_to new_style_path, class: "btn-primary" do
+            %svg.h-5.w-5.mr-2{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+              %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M12 4.5v15m7.5-7.5h-15"}
+            Create New Style
+
+  / Styles Grid
+  - if @styles.any?
+    .grid.grid-cols-1.gap-6.sm:grid-cols-2.lg:grid-cols-3
+      - @styles.each do |style|
+        .card
+          .px-4.py-5.sm:p-6
+            %h3.text-lg.font-medium.text-gray-900.truncate= style.title
+            %p.mt-2.text-sm.text-gray-500.line-clamp-3= style.prompt
+            .mt-4.flex.items-center.justify-between
+              %div.flex.space-x-2
+                = link_to style_path(style), class: "text-indigo-600 hover:text-indigo-500 text-sm font-medium" do
+                  View
+                = link_to edit_style_path(style), class: "text-gray-600 hover:text-gray-500 text-sm font-medium" do
+                  Edit
+              %div
+                = link_to style_path(style), data: { confirm: "Are you sure?", turbo_method: :delete }, class: "text-red-600 hover:text-red-500 text-sm font-medium" do
+                  Delete
+  - else
+    .text-center.py-12
+      %svg.mx-auto.h-12.w-12.text-gray-400{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+        %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 0 3 3 0 00-1.07-4.131A48.633 48.633 0 0112 5.25c2.587 0 5.084.205 7.47.598a3 3 0 001.071 4.131 2.25 2.25 0 01-2.4 0 3 3 0 00-5.781-1.128 48.629 48.629 0 01-6.36 6.243z"}
+      %h3.mt-2.text-sm.font-medium.text-gray-900 No styles yet
+      %p.mt-1.text-sm.text-gray-500 Get started by creating your first style template.
+      .mt-6
+        = link_to new_style_path, class: "btn-primary" do
+          %svg.h-5.w-5.mr-2{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+            %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M12 4.5v15m7.5-7.5h-15"}
+          Create Your First Style

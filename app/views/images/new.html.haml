@@ -1,0 +1,58 @@
+.space-y-6
+  / Header
+  .bg-white.shadow
+    .px-4.py-5.sm:p-6
+      .flex.items-center.justify-between
+        %div
+          %h1.text-3xl.font-bold.leading-tight.text-gray-900 Upload New Image
+          %p.mt-2.max-w-4xl.text-sm.text-gray-500
+            Upload an image file to add to your collection
+        %div
+          = link_to images_path, class: "btn-secondary" do
+            %svg.h-5.w-5.mr-2{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+              %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"}
+            Back to Images
+
+  / Form
+  .bg-white.shadow.rounded-lg
+    .px-4.py-5.sm:p-6
+      = form_with model: @image, local: true, multipart: true, class: "space-y-6" do |form|
+        - if @image.errors.any?
+          .bg-red-50.border.border-red-200.rounded-md.p-4.mb-6
+            .flex
+              .flex-shrink-0
+                %svg.h-5.w-5.text-red-400{"aria-hidden" => "true", fill: "currentColor", viewbox: "0 0 20 20"}
+                  %path{"clip-rule" => "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z", "fill-rule" => "evenodd"}
+              .ml-3
+                %h3.text-sm.font-medium.text-red-800
+                  = pluralize(@image.errors.count, "error")
+                  prohibited this image from being saved:
+                .mt-2
+                  %ul.list-disc.list-inside.text-sm.text-red-700
+                    - @image.errors.full_messages.each do |message|
+                      %li= message
+
+        .form-group
+          = form.label :file, class: "block text-sm font-medium text-gray-700"
+          .mt-1.flex.justify-center.px-6.pt-5.pb-6.border-2.border-gray-300.border-dashed.rounded-md
+            .space-y-1.text-center
+              %svg.mx-auto.h-12.w-12.text-gray-400{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1", viewbox: "0 0 48 48"}
+                %path{d: "M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02", "stroke-linecap" => "round", "stroke-linejoin" => "round"}
+              .flex.text-sm.text-gray-600
+                %label.relative.cursor-pointer.bg-white.rounded-md.font-medium.text-indigo-600.hover:text-indigo-500.focus-within:outline-none.focus-within:ring-2.focus-within:ring-offset-2.focus-within:ring-indigo-500{for: "image_file"}
+                  %span Upload a file
+                  = form.file_field :file, id: "image_file", class: "sr-only", accept: "image/*"
+                %p.pl-1 or drag and drop
+              %p.text-xs.text-gray-500 PNG, JPG, GIF up to 10MB
+
+        .form-group
+          = form.label :image_request_id, "Related Image Request (Optional)", class: "block text-sm font-medium text-gray-700"
+          .mt-1
+            = form.collection_select :image_request_id, ImageRequest.includes(:style), :id, :prompt, { prompt: "Select an image request", include_blank: true }, { class: "form-input" }
+          %p.mt-2.text-sm.text-gray-500
+            Link this image to an existing image request if applicable.
+
+        .flex.justify-end.space-x-3
+          = link_to images_path, class: "btn-secondary" do
+            Cancel
+          = form.submit "Upload Image", class: "btn-primary"

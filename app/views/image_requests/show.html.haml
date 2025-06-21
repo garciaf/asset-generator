@@ -1,0 +1,82 @@
+= turbo_stream_from @image_request
+.space-y-6
+  / Header
+  .bg-white.shadow
+    .px-4.py-5.sm:p-6
+      .flex.items-center.justify-between
+        %div
+          %h1.text-3xl.font-bold.leading-tight.text-gray-900 Image Request Details
+          %p.mt-2.max-w-4xl.text-sm.text-gray-500
+            View the details of your image generation request
+        %div
+          = link_to image_requests_path, class: "btn-secondary" do
+            %svg.h-5.w-5.mr-2{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+              %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"}
+            Back to Image Requests
+
+  / Content
+  .bg-white.shadow.rounded-lg
+    .px-4.py-5.sm:p-6
+      .space-y-6
+        / Style Information
+        %div
+          %h3.text-lg.font-medium.text-gray-900 Style Used
+          .mt-2.bg-gray-50.rounded-lg.p-4
+            %h4.text-sm.font-medium.text-gray-900= @image_request.style.title
+            - if @image_request.style.prompt.present?
+              %p.mt-2.text-sm.text-gray-600= @image_request.style.prompt
+
+        / Prompt Information
+        %div
+          %h3.text-lg.font-medium.text-gray-900 Your Prompt
+          .mt-2.bg-gray-50.rounded-lg.p-4
+            %p.text-sm.text-gray-900= @image_request.prompt
+
+        / Status and Metadata
+        %div
+          %h3.text-lg.font-medium.text-gray-900 Request Details
+          .mt-2.grid.grid-cols-1.gap-4.sm:grid-cols-2
+            .bg-gray-50.rounded-lg.p-4
+              %dt.text-sm.font-medium.text-gray-500 Created
+              %dd.mt-1.text-sm.text-gray-900= @image_request.created_at.strftime("%B %d, %Y at %I:%M %p")
+            .bg-gray-50.rounded-lg.p-4
+              %dt.text-sm.font-medium.text-gray-500 Status
+              %dd.mt-1
+                - if @image_request.image.present?
+                  %span.inline-flex.items-center.px-2.5.py-0.5.rounded-full.text-xs.font-medium.bg-green-100.text-green-800
+                    Generated
+                - else
+                  %span.inline-flex.items-center.px-2.5.py-0.5.rounded-full.text-xs.font-medium.bg-yellow-100.text-yellow-800
+                    Pending
+
+        / Generated Image (if available)
+        - if @image_request.image.present?
+          %div
+            %h3.text-lg.font-medium.text-gray-900 Generated Image
+            .mt-2.bg-gray-50.rounded-lg.p-4
+              .space-y-4
+                - if @image_request.image.file.attached?
+                  .text-center
+                    = image_tag @image_request.image.file, alt: @image_request.image.title, class: "max-w-full h-auto rounded-lg shadow-lg mx-auto"
+                  %p.text-sm.text-gray-600.mt-2= @image_request.image.title
+                  - if @image_request.image.description.present?
+                    %p.text-xs.text-gray-500.mt-1 Revised prompt: #{@image_request.image.description}
+                - else
+                  %p.text-sm.text-gray-600 Image file is being processed...
+        - else
+          %div
+            %h3.text-lg.font-medium.text-gray-900 Image Generation
+            .mt-2.bg-yellow-50.rounded-lg.p-4
+              .flex.items-center
+                %svg.animate-spin.h-5.w-5.text-yellow-600.mr-2{"aria-hidden" => "true", fill: "none", viewbox: "0 0 24 24"}
+                  %circle.opacity-25{cx: "12", cy: "12", r: "10", stroke: "currentColor", "stroke-width" => "4"}
+                  %path.opacity-75{d: "m100 50 A 40 40 0 0 1 60 90 L 50 90 A 40 40 0 0 1 90 50 L 100 50 Z", fill: "currentColor", transform: "translate(2,2)"}
+                %p.text-sm.text-yellow-800 Your image is being generated... This may take a few moments.
+
+        / Actions
+        .flex.justify-end.space-x-3
+          = link_to image_requests_path, class: "btn-secondary" do
+            Back to List
+          - unless @image_request.image.present?
+            = link_to generate_image_request_path(@image_request), data: { turbo_method: :post }, class: "btn-primary" do
+              Generate Image
