@@ -30,7 +30,7 @@
                 = link_to variation_path(variation), class: "text-indigo-600 hover:text-indigo-500 text-sm font-medium" do
                   View
               %div
-                = link_to variation_path(variation), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-500 text-sm font-medium" do
+                = link_to variation_path(variation), data: { turbo_confirm: "Are you sure?", turbo_method: :delete }, class: "text-red-600 hover:text-red-500 text-sm font-medium" do
                   Delete
             .mt-2.text-xs.text-gray-400
               Created #{time_ago_in_words(variation.created_at)} ago

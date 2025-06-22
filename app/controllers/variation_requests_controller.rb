@@ -25,6 +25,13 @@ class VariationRequestsController < ApplicationController
     end
   end
 
+  def generate
+    @variation_request = VariationRequest.find(params[:id])
+    GenerateVariationJob.perform_later(@variation_request)
+
+    redirect_to @variation_request, notice: "Variation generation has started."
+  end
+
   private
 
   def variation_request_params

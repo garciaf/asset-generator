@@ -83,5 +83,9 @@
 
         / Actions
         .flex.justify-end.space-x-3
+          = link_to generate_variation_request_path(@variation_request), class: "btn-primary", data: { turbo_method: :post } do
+            %svg.h-5.w-5.mr-2{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+              %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M12 4.5v15m7.5-7.5h-15"}
+            Regenerate Variation
           = link_to variation_requests_path, class: "btn-secondary" do
             Back to List

@@ -41,24 +41,18 @@ class GenerateImageJob < ApplicationJob
 
     response = client.images.generate(
       parameters: {
-        model: "dall-e-3",
+        model: "gpt-image-1",
         prompt: prompt,
         size: "1024x1024",
-        style: "vivid",
-        quality: "standard",
-        n: 1
+        quality: "auto"
       }
     )
-
-    unless response.dig("data", 0, "url")
-      raise "OpenAI API did not return an image URL"
-    end
 
     response
   end
 
   def download_and_attach_image(openai_response)
-    image_url = openai_response.dig("data", 0, "url")
+    image_data = openai_response.dig("data", 0, "b64_json")
     revised_prompt = openai_response.dig("data", 0, "revised_prompt")
 
     # Create Image record
@@ -66,10 +60,10 @@ class GenerateImageJob < ApplicationJob
       title: generate_image_title,
       description: revised_prompt || @image_request.prompt
     )
-
+    Rails.logger.info "Created Image ##{image.id} for ImageRequest ##{@image_request.id}"
+    Rails.logger.info "Image data size: #{image_data.size} bytes"
     # Download and attach the image file
-    uri = URI.parse(image_url)
-    downloaded_image = uri.open
+    downloaded_image = StringIO.new(Base64.decode64(image_data))
 
     # Generate filename with timestamp
     filename = "generated_image_#{Time.current.to_i}.png"

@@ -23,15 +23,15 @@ class GenerateVariationJob < ApplicationJob
       # Use the first source image for editing with DALL-E 2
       source_image = source_images.first
       edit_prompt = build_edit_prompt(@variation_request.prompt)
-      response = generate_variation_with_dalle2(source_image, edit_prompt)
+      response = generate_variation_with_ai(source_image, edit_prompt)
 
-      if response.dig("data", 0, "url").present?
-        image_url = response.dig("data", 0, "url")
+      if response.dig("data", -1, "b64_json").present?
+        image_data = response.dig("data", -1, "b64_json")
 
-        create_variation_from_url(@variation_request, image_url, edit_prompt)
+        create_variation_from_data(@variation_request, image_data, edit_prompt)
         Rails.logger.info "Successfully generated variation for VariationRequest ##{@variation_request.id}"
       else
-        Rails.logger.error "No image URL in OpenAI response for VariationRequest ##{@variation_request.id}"
+        Rails.logger.error "No image data in OpenAI response for VariationRequest ##{@variation_request.id}"
       end
 
     rescue => e
@@ -60,7 +60,7 @@ class GenerateVariationJob < ApplicationJob
     "#{user_prompt}, #{preservation_instructions}"
   end
 
-  def generate_variation_with_dalle2(source_image, prompt)
+  def generate_variation_with_ai(source_image, prompt)
     client = OpenAI::Client.new
 
     # Convert image to the required format
@@ -74,10 +74,10 @@ class GenerateVariationJob < ApplicationJob
       response = client.images.edit(
         parameters: {
           image: image_file,
-          mask: mask_file,
           prompt: prompt,
           n: 1,
-          size: "512x512"
+          size: "auto",
+          model: "gpt-image-1"
         }
       )
       response
@@ -131,10 +131,7 @@ class GenerateVariationJob < ApplicationJob
     image_data
   end
 
-  def create_variation_from_url(variation_request, image_url, edit_prompt)
-    # Download the generated image
-    image_data = URI.open(image_url).read
-
+  def create_variation_from_data(variation_request, image_data, edit_prompt)
     # Create new variation
     variation = Variation.create!(
       image: variation_request.images.first # Link to the primary source image
@@ -142,7 +139,7 @@ class GenerateVariationJob < ApplicationJob
 
     # Attach the downloaded image
     variation.file.attach(
-      io: StringIO.new(image_data),
+      io: StringIO.new(Base64.decode64(image_data)),
       filename: "variation_#{variation.id}.png",
       content_type: "image/png"
     )

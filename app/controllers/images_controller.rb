@@ -2,7 +2,7 @@ class ImagesController < ApplicationController
   before_action :set_image, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @images = Image.all
+    @images = Image.order(created_at: :desc).all
   end
 
   def show
@@ -40,7 +40,7 @@ class ImagesController < ApplicationController
   private
 
   def set_image
-    @image = Image.find(params[:id])
+    @image = Image.includes(variations: :file_attachment).find(params[:id])
   end
 
   def image_params

@@ -1,6 +1,6 @@
 class ImageRequestsController < ApplicationController
   def index
-    @image_requests = ImageRequest.includes(:style).all
+    @image_requests = ImageRequest.includes(:style).order(created_at: :desc).all
   end
 
   def show

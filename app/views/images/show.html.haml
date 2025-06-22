@@ -72,3 +72,24 @@
                 %svg.h-5.w-5.mr-2.inline{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
                   %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"}
                 Download Image
+
+  / Variations Section
+  - if @image.variations.any?
+    .bg-white.shadow.rounded-lg
+      .px-4.py-5.sm:p-6
+        .flex.items-center.justify-between.mb-4
+          %h3.text-lg.font-medium.text-gray-900 Variations
+          %span.text-sm.text-gray-500= pluralize(@image.variations.count, 'variation')
+
+        .grid.grid-cols-2.sm:grid-cols-3.md:grid-cols-4.lg:grid-cols-6.gap-4
+          - @image.variations.order(created_at: :desc).each do |variation|
+            = link_to variation_path(variation), class: "group block" do
+              .aspect-square.bg-gray-100.rounded-lg.overflow-hidden.transition-all.duration-200.group-hover:shadow-md.group-hover:scale-105
+                - if variation.file.attached?
+                  = image_tag variation.file, class: "w-full h-full object-cover", alt: "Variation thumbnail"
+                - else
+                  .w-full.h-full.flex.items-center.justify-center
+                    %svg.h-8.w-8.text-gray-400{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+                      %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"}
+              .mt-2.text-center
+                %p.text-xs.text-gray-600.truncate= variation.created_at.strftime("%m/%d/%y %I:%M %p")
