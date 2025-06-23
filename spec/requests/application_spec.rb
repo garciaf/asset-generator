@@ -187,8 +187,8 @@ RSpec.describe "Application Routes and Navigation", type: :request do
   describe "Content Security Policy" do
     it "includes CSP headers or meta tags" do
       get "/"
-      expect(response.headers).to have_key("Content-Security-Policy") ||
       expect(response.body).to include("csp-nonce")
+      expect(response.headers).to have_key("Content-Security-Policy")
     end
   end
 

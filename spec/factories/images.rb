@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :image do
     title { "Test Image" }
     description { "A test image for sprite generation" }
-    
+
     trait :with_file do
       after(:build) do |image|
         # Create a minimal valid PNG file (1x1 pixel)
@@ -14,7 +14,7 @@ FactoryBot.define do
         )
       end
     end
-    
+
     trait :without_request do
       image_request { nil }
     end

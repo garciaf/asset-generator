@@ -5,5 +5,4 @@ class Variation < ApplicationRecord
   has_one_attached :file
 
   validates :image, presence: true
-  validates :file, presence: true, on: :create
 end

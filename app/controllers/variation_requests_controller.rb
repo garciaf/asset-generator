@@ -1,6 +1,6 @@
 class VariationRequestsController < ApplicationController
   def index
-    @variation_requests = VariationRequest.includes(:variation, :images).all
+    @variation_requests = VariationRequest.includes(:variation, :images).order(created_at: :desc).all
   end
 
   def show
