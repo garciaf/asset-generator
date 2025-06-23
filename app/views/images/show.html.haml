@@ -67,6 +67,10 @@
         .px-4.py-5.sm:p-6
           %h3.text-lg.font-medium.text-gray-900.mb-4 Actions
           .space-y-3
+            = link_to new_variation_path(image_id: @image.id), class: "w-full btn-primary block text-center" do
+              %svg.h-5.w-5.mr-2.inline{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+                %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M12 4.5v15m7.5-7.5h-15"}
+              Add Variation
             - if @image.file.attached?
               = link_to rails_blob_path(@image.file, disposition: "attachment"), class: "w-full btn-secondary block text-center" do
                 %svg.h-5.w-5.mr-2.inline{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}

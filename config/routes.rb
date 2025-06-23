@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     end
   end
   resources :images, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
-  resources :variations, only: [ :index, :show, :destroy ]
+  resources :variations, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
   resources :variation_requests, only: [ :index, :show, :new, :create ] do
     member do
       post :generate

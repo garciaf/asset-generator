@@ -26,6 +26,14 @@
     @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500;
   }
 
+  .form-group {
+    @apply space-y-1;
+  }
+
+  .form-error {
+    @apply text-sm text-red-600;
+  }
+
   .image-placeholder {
     @apply w-full h-full object-center object-cover bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center;
   }

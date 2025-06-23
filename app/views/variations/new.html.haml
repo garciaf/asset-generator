@@ -1,0 +1,18 @@
+.space-y-6
+  / Header
+  .bg-white.shadow
+    .px-4.py-5.sm:p-6
+      .flex.items-center.justify-between
+        %div
+          %h1.text-3xl.font-bold.leading-tight.text-gray-900 Add New Variation
+          %p.mt-2.max-w-4xl.text-sm.text-gray-500
+            Upload a variation of an existing image that was created outside the app
+        %div
+          = link_to variations_path, class: "btn-secondary" do
+            %svg.h-5.w-5.mr-2{"aria-hidden" => "true", fill: "none", stroke: "currentColor", "stroke-width" => "1.5", viewbox: "0 0 24 24"}
+              %path{"stroke-linecap" => "round", "stroke-linejoin" => "round", d: "M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"}
+            Back to Variations
+
+  / Form
+  .bg-white.shadow.rounded-lg
+    = render 'form'
