@@ -28,4 +28,7 @@ Rails.application.routes.draw do
       post :generate
     end
   end
+  
+  # Downloads
+  resources :downloads, only: [:show]
 end

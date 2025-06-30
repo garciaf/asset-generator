@@ -7,9 +7,46 @@ A modern Rails application for generating AI-powered images with custom styles a
 - **Style Management**: Create and manage custom AI prompts and styles
 - **Image Generation**: Generate AI images using OpenAI's DALL-E
 - **Image Variations**: Create variations of existing images
+- **Download Package**: Download images with all variations in multiple sizes (ZIP format)
 - **Modern UI**: Beautiful, responsive interface built with Tailwind CSS
 - **Dashboard**: Real-time statistics and quick access to all features
 - **Gallery**: Browse and organize all generated images
+
+## 📦 Download Features
+
+The Asset Generator includes a comprehensive download system that allows you to download images with all their variations in multiple sizes:
+
+### Size Variations
+- **Original**: Full resolution as generated
+- **1024px**: Web-optimized large size
+- **512px**: Medium size for general use
+- **64px**: Thumbnail/icon size
+
+### Download Package Structure
+```
+image_name_assets.zip
+├── original/
+│   ├── image_name.jpg
+│   └── variation_1.jpg
+├── 1024px/
+│   ├── image_name_1024px.jpg
+│   └── variation_1_1024px.jpg
+├── 512px/
+│   ├── image_name_512px.jpg
+│   └── variation_1_512px.jpg
+└── 64px/
+    ├── image_name_64px.jpg
+    └── variation_1_64px.jpg
+```
+
+### Usage
+1. Navigate to any image page
+2. Click "Download All Sizes (ZIP)" button
+3. The system will generate a ZIP file containing:
+   - The original image and all its variations
+   - Each image resized to 4 different sizes
+   - Organized in separate folders by size
+   - Maintains aspect ratio for all resized versions
 
 ## 🛠️ Technology Stack
 
