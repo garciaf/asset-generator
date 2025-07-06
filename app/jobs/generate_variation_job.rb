@@ -1,6 +1,8 @@
 class GenerateVariationJob < ApplicationJob
   require "open-uri"
   require "tempfile"
+  require "vips"
+  SIZE_FOR_EDITING = [512, 512].freeze
 
   queue_as :default
 
@@ -23,6 +25,7 @@ class GenerateVariationJob < ApplicationJob
       # Use the first source image for editing with DALL-E 2
       source_image = source_images.first
       edit_prompt = build_edit_prompt(@variation_request.prompt)
+
       response = generate_variation_with_ai(source_image, edit_prompt)
 
       if response.dig("data", -1, "b64_json").present?
@@ -66,17 +69,23 @@ class GenerateVariationJob < ApplicationJob
     # Convert image to the required format
     image_file = prepare_image_for_editing(source_image)
 
-    # Create a mask that covers the entire image
-    mask_file = create_full_image_mask(image_file)
+    # Create mask - use custom mask if provided, otherwise full image mask
+    mask_file = if @variation_request.mask_data.present?
+      create_custom_mask_from_data(@variation_request)
+    else
+      create_full_image_mask(image_file)
+    end
 
     begin
-      # Use edits endpoint with full image mask
+      # Use edits endpoint with mask
       response = client.images.edit(
         parameters: {
           image: image_file,
+          mask: mask_file,
           prompt: prompt,
           n: 1,
           size: "auto",
+          background: "transparent", # Use transparent background for better results
           model: "gpt-image-1"
         }
       )
@@ -91,7 +100,7 @@ class GenerateVariationJob < ApplicationJob
   def prepare_image_for_editing(image)
     # Download and prepare the image as a File object for the API
     small_image = image.file.variant(
-      resize_to_limit: [ 512, 512 ],
+      resize_to_limit: SIZE_FOR_EDITING,
       format: :png,
       saver: { quality: 90 }
     ).processed
@@ -106,29 +115,6 @@ class GenerateVariationJob < ApplicationJob
     temp_file.rewind
 
     temp_file
-  end
-
-  def preprocess_image_for_dalle(image_data)
-    # Use ActiveStorage variant with image_processing for resizing and PNG conversion
-    require "active_storage/variant"
-    require "active_storage/blob"
-    require "image_processing/mini_magick"
-
-    blob = ActiveStorage::Blob.create_after_upload!(
-      io: StringIO.new(image_data),
-      filename: "source.png",
-      content_type: "image/png"
-    )
-
-    variant = blob.variant(
-      resize_to_fill: [ 1024, 1024 ],
-      format: :png
-    ).processed
-
-    variant.download
-  rescue => e
-    Rails.logger.warn "Image preprocessing failed, using original: #{e.message}"
-    image_data
   end
 
   def create_variation_from_data(variation_request, image_data, edit_prompt)
@@ -154,8 +140,6 @@ class GenerateVariationJob < ApplicationJob
 
   def create_full_image_mask(image_file)
     # Create a white mask that covers the entire image (allows editing everywhere)
-    require "vips"
-
     # Read the original image to get dimensions
     image_file.rewind
     image = Vips::Image.new_from_buffer(image_file.read, "")
@@ -164,8 +148,11 @@ class GenerateVariationJob < ApplicationJob
     width = image.width
     height = image.height
 
+    Rails.logger.info "Creating full mask with dimensions: #{width}x#{height}"
+
     # Create a completely white mask (indicates the entire image can be edited)
-    mask = Vips::Image.black(width, height, bands: 1) + 255
+    # Use uchar format to match what OpenAI expects
+    mask = Vips::Image.black(width, height, bands: 1).cast(:uchar) + 255
 
     # Convert to PNG format
     mask_data = mask.write_to_buffer(".png")
@@ -177,5 +164,26 @@ class GenerateVariationJob < ApplicationJob
     temp_mask.rewind
 
     temp_mask
+  end
+
+  def create_custom_mask_from_data(variation_request)
+    variation_request.attach_mask_data
+    
+    small_image = variation_request.mask.variant(
+      resize_to_limit: SIZE_FOR_EDITING,
+      format: :png,
+      saver: { quality: 90 }
+    ).processed
+
+    processed_data = small_image.download
+
+    # Preprocess image for better results with DALL-E 2
+    # Create a temporary file with proper extension
+    temp_file = Tempfile.new([ "mask_image", ".png" ])
+    temp_file.binmode
+    temp_file.write(processed_data)
+    temp_file.rewind
+
+    temp_file
   end
 end

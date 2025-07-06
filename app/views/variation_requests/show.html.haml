@@ -42,6 +42,52 @@
             .mt-2.bg-gray-50.rounded-lg.p-4
               %p.text-sm.text-gray-900= @variation_request.prompt
 
+        / Mask Information (if provided)
+        - if @variation_request.mask_data.present?
+          %div
+            %h3.text-lg.font-medium.text-gray-900 Edit Mask
+            .mt-2.bg-gray-50.rounded-lg.p-4
+              .text-center
+                %canvas#mask-preview{width: "256", height: "256", style: "border: 1px solid #d1d5db; border-radius: 8px; max-width: 100%;"}
+                %p.text-sm.text-gray-600.mt-2 Areas marked for editing (shown in red overlay)
+              :javascript
+                const canvas = document.getElementById('mask-preview');
+                const ctx = canvas.getContext('2d');
+                const maskData = '#{@variation_request.mask_data}';
+                
+                if (maskData) {
+                  const img = new Image();
+                  img.onload = function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw a checkerboard background to show transparency
+                    const checkSize = 8;
+                    ctx.fillStyle = '#f3f4f6';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#e5e7eb';
+                    for (let x = 0; x < canvas.width; x += checkSize * 2) {
+                      for (let y = 0; y < canvas.height; y += checkSize * 2) {
+                        ctx.fillRect(x, y, checkSize, checkSize);
+                        ctx.fillRect(x + checkSize, y + checkSize, checkSize, checkSize);
+                      }
+                    }
+                    
+                    // Draw the mask with red tint
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = img.width;
+                    tempCanvas.height = img.height;
+                    
+                    tempCtx.fillStyle = 'rgba(255, 100, 100, 0.8)';
+                    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                    tempCtx.globalCompositeOperation = 'destination-in';
+                    tempCtx.drawImage(img, 0, 0);
+                    
+                    ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+                  };
+                  img.src = 'data:image/png;base64,' + maskData;
+                }
+
         / Status and Metadata
         %div
           %h3.text-lg.font-medium.text-gray-900 Request Details

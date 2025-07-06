@@ -6,3 +6,6 @@ import { application } from "./application"
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import MaskPainterController from "./mask_painter_controller"
+application.register("mask-painter", MaskPainterController)

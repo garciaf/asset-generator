@@ -35,6 +35,6 @@ class VariationRequestsController < ApplicationController
   private
 
   def variation_request_params
-    params.require(:variation_request).permit(:prompt, image_ids: [])
+    params.require(:variation_request).permit(:prompt, :mask_data, image_ids: [])
   end
 end
