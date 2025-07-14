@@ -67,4 +67,4 @@ gem "ruby-openai", "~> 8.1"
 
 gem "ruby-vips", "~> 2.2"
 
-gem "mission_control-jobs", "~> 1.0"
+gem "mission_control-jobs", "~> 1.1"
